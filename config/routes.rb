@@ -3,7 +3,8 @@ Rails.application.routes.draw do
 
   namespace :api do
     namespace :v1 do
-      post 'login', to 'users#login'
+      get 'login', to: 'users#login'
+      get 'current-user', to: 'users#create'
     end
   end
 end
