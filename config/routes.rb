@@ -5,6 +5,7 @@ Rails.application.routes.draw do
     namespace :v1 do
       get 'login', to: 'users#login'
       get 'current-user', to: 'users#create'
+      get 'search-zip/:search', to: 'locations#search'
     end
   end
 end

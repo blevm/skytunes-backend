@@ -15,12 +15,10 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def create
-
     if params[:error]
       puts 'ERROR', params
       redirect_to 'http://localhost:3000/login/failure'
     else
-
       body = {
         grant_type: 'authorization_code',
         code: params[:code],
@@ -31,7 +29,7 @@ class Api::V1::UsersController < ApplicationController
 
       auth_response = RestClient.post('https://accounts.spotify.com/api/token', body)
       auth_params = JSON.parse(auth_response.body)
-      
+
       header = {Authorization: "Bearer #{auth_params["access_token"]}"}
       user_response = RestClient.get('https://api.spotify.com/v1/me', header)
       user_params = JSON.parse(user_response.body)
@@ -44,7 +42,6 @@ class Api::V1::UsersController < ApplicationController
       @user.update(access_token:auth_params["access_token"], refresh_token: auth_params["refresh_token"])
 
       redirect_to "http://localhost:3000/success"
-
     end
   end
 
