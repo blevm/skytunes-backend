@@ -5,7 +5,9 @@ Rails.application.routes.draw do
     namespace :v1 do
       get 'login', to: 'users#login'
       get 'current-user', to: 'users#create'
-      get 'search-zip/:search', to: 'locations#search'
+      get 'search-zip/:search', to: 'locations#zip_search'
+      get 'search-city/:search', to: 'locations#city_search'
+      get ':username/recommended-tracks', to: 'users#get_recommended_tracks'
     end
   end
 end
