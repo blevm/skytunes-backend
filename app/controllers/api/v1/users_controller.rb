@@ -8,6 +8,7 @@ class Api::V1::UsersController < ApplicationController
       scope: 'playlist-modify-public user-top-read user-read-recently-played user-library-read',
       show_dialog: true
     }
+
     url = "https://accounts.spotify.com/authorize/"
 
     redirect_to "#{url}?#{params.to_query}"
@@ -57,10 +58,23 @@ class Api::V1::UsersController < ApplicationController
 
     header = {Authorization: "Bearer #{@user["access_token"]}"}
 
-    rec_response = RestClient.get("https://api.spotify.com/v1/recommendations/?type=tracks&seed_artists=#{@user.artists.map{|artist|artist.spotify_id}.join(',')}", header)
+    additional_params = get_weather_attributes(params[:weather])
+
+    rec_response = RestClient.get("https://api.spotify.com/v1/recommendations/?type=tracks&seed_artists=#{@user.artists.first(3).map{|artist|artist.spotify_id}.join(',')}&#{additional_params.to_query}", header)
     rec_params = JSON.parse(rec_response.body)
 
     render json: rec_params
+  end
+
+  def get_seed_genres
+    @user = User.find_by(username: params[:username])
+
+    header = {Authorization: "Bearer #{@user["access_token"]}"}
+
+    genre_response = RestClient.get("https://api.spotify.com/v1/recommendations/available-genre-seeds", header)
+    genre_params = JSON.parse(genre_response.body)
+
+    render json: genre_params
   end
 
   private

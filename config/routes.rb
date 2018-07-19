@@ -7,7 +7,8 @@ Rails.application.routes.draw do
       get 'current-user', to: 'users#create'
       get 'search-zip/:search', to: 'locations#zip_search'
       get 'search-city/:search', to: 'locations#city_search'
-      get ':username/recommended-tracks', to: 'users#get_recommended_tracks'
+      get ':username/:weather/recommended-tracks', to: 'users#get_recommended_tracks'
+      get ':username/seed-genres', to: 'users#get_seed_genres'
     end
   end
 end
