@@ -55,6 +55,7 @@ class Api::V1::UsersController < ApplicationController
 
   def get_recommended_tracks
     @user = User.find_by(username: params[:username])
+    @user.refresh_the_token
 
     header = {Authorization: "Bearer #{@user["access_token"]}"}
 
@@ -68,6 +69,7 @@ class Api::V1::UsersController < ApplicationController
 
   def get_seed_genres
     @user = User.find_by(username: params[:username])
+    @user.refresh_the_token
 
     header = {Authorization: "Bearer #{@user["access_token"]}"}
 
