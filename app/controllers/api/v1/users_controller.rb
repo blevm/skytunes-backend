@@ -79,6 +79,35 @@ class Api::V1::UsersController < ApplicationController
     render json: genre_params
   end
 
+  def new_playlist
+    @user = User.find_by(username: params[:username])
+    @user.refresh_the_token
+
+    playlist_body = {
+      name: params[:title],
+      public: true,
+      collaborative: false,
+      description: 'playlist created by sky tunes',
+    }
+
+    playlist_response = RestClient::Request.execute(
+      method: :post,
+      url: "https://api.spotify.com/v1/users/#{@user.username}/playlists",
+      payload: playlist_body.to_json,
+      headers: {
+        "Authorization" => "Bearer #{@user["access_token"]}",
+        content_type: 'application/json'
+        }
+      )
+    playlist_params = JSON.parse(playlist_response.body)
+
+    track_body = {"uris": JSON.parse(request.body.string)['songs'].split(',')}
+
+    add_tracks_response = RestClient::Request.execute(method: :post,url: "https://api.spotify.com/v1/users/#{@user.username}/playlists/#{playlist_params["id"]}/tracks",payload: track_body.to_json,headers: {"Authorization" => "Bearer #{@user["access_token"]}",content_type: 'application/json'})
+
+    # redirect_to playlist_params['external_urls']['spotify']
+  end
+
   private
 
   def get_auth(code)

@@ -9,6 +9,7 @@ Rails.application.routes.draw do
       get 'search-city/:search', to: 'locations#city_search'
       get ':username/:weather/recommended-tracks', to: 'users#get_recommended_tracks'
       get ':username/seed-genres', to: 'users#get_seed_genres'
+      post ':username/:title/new-playlist', to: 'users#new_playlist'
     end
   end
 end
