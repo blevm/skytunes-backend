@@ -1,6 +1,8 @@
 class User < ApplicationRecord
   has_many :saved_locations
   has_many :locations, through: :saved_locations
+  has_many :artists
+  has_many :tracks
 
   validates :username, uniqueness: true, presence: true
 
