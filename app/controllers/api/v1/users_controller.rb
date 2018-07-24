@@ -108,6 +108,14 @@ class Api::V1::UsersController < ApplicationController
     # redirect_to playlist_params['external_urls']['spotify']
   end
 
+  def logout
+    @user = User.find_by(username: params[:username])
+
+    @user.update(access_token:'', refresh_token: '')
+
+    redirect_to 'http://localhost:3000/'
+  end
+
   private
 
   def get_auth(code)

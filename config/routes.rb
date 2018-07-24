@@ -10,6 +10,7 @@ Rails.application.routes.draw do
       get ':username/:weather/recommended-tracks', to: 'users#get_recommended_tracks'
       get ':username/seed-genres', to: 'users#get_seed_genres'
       post ':username/:title/new-playlist', to: 'users#new_playlist'
+      get ':username/logout', to: 'users#logout'
     end
   end
 end
