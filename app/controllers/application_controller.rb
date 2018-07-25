@@ -2,7 +2,15 @@ class ApplicationController < ActionController::API
 
   def get_weather_attributes(weather)
     case weather
-    when 'clear-day' || 'clear-night'
+    when 'clear-day'
+      params = {
+        limit: 30,
+        seed_genres: "summer,happy",
+        min_danceability: 0.5,
+        min_tempo: 105
+      }
+      return params
+    when 'clear-night'
       params = {
         limit: 30,
         seed_genres: "summer,happy",
@@ -13,9 +21,9 @@ class ApplicationController < ActionController::API
     when 'rain'
       params = {
         limit: 30,
-        seed_genres: "rainy-day,chill",
+        seed_genres: "rainy-day,jazz",
         max_acousticness: 0.9,
-        max_tempo: 105
+        max_tempo: 80
       }
       return params
     when 'snow'
@@ -52,7 +60,14 @@ class ApplicationController < ActionController::API
         seed_genres: "sad,ambient",
       }
       return params
-    when 'partly-cloudy-day' || 'partly-cloudy-night'
+    when 'partly-cloudy-day'
+      params = {
+        limit: 30,
+        seed_genres: "indie,pop",
+        min_danceability: 0.4
+      }
+      return params
+    when 'partly-cloudy-night'
       params = {
         limit: 30,
         seed_genres: "indie,pop",

@@ -26,6 +26,32 @@ class Api::V1::LocationsController < ApplicationController
     render json: weather_object
   end
 
+  def current_search
+    lat_long_data = get_city_from_lat_long
+    weather_data = get_current_weather_from_city(lat_long_data)
+
+    weather_object = {
+      currently: weather_data["currently"],
+      minutely: weather_data["minutely"],
+      city: lat_long_data["city"]
+    }
+
+    render json: weather_object
+  end
+
+  def intl_search
+    lat_long_data = get_lat_long_from_place
+    weather_data = get_current_weather_from_city(lat_long_data)
+
+    weather_object = {
+      currently: weather_data["currently"],
+      minutely: weather_data["minutely"],
+      city: lat_long_data["standard"]["city"]
+    }
+
+    render json: weather_object
+  end
+
   private
 
   def get_lat_long_from_zip
@@ -36,6 +62,18 @@ class Api::V1::LocationsController < ApplicationController
 
   def get_lat_long_from_city
     response= RestClient.get("https://geocode.xyz/#{params[:search].gsub!(' ', '%20')}?json=1&region=US")
+
+    return JSON.parse(response.body)
+  end
+
+  def get_city_from_lat_long
+    response= RestClient.get("https://geocode.xyz/#{params[:lat]},#{params[:long]}?json=1")
+
+    return JSON.parse(response.body)
+  end
+
+  def get_lat_long_from_place
+    response= RestClient.get("https://geocode.xyz/#{params[:search].gsub!(' ', '%20')}?json=1")
 
     return JSON.parse(response.body)
   end
