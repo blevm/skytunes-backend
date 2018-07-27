@@ -7,8 +7,10 @@ class Api::V1::LocationsController < ApplicationController
     weather_object = {
       currently: weather_data["currently"],
       minutely: weather_data["minutely"],
-      city: lat_long_data["name"]
+      city: lat_long_data["name"].titleize
     }
+
+    save_a_location(lat_long_data["name"].titleize, '', params[:search], lat_long_data["coord"]["lat"].to_s, lat_long_data["coord"]["lon"].to_s, 'zipSearch')
 
     render json: weather_object
   end
@@ -20,8 +22,10 @@ class Api::V1::LocationsController < ApplicationController
     weather_object = {
       currently: weather_data["currently"],
       minutely: weather_data["minutely"],
-      city: lat_long_data["standard"]["city"]
+      city: lat_long_data["standard"]["city"].titleize
     }
+
+    save_a_location(params[:search].gsub('%20',' ').split(',')[0] || lat_long_data["standard"]["city"].titleize,params[:search].gsub('%20',' ').split(',')[1] || '', '', lat_long_data["latt"], lat_long_data["longt"], 'citySearch')
 
     render json: weather_object
   end
@@ -33,8 +37,10 @@ class Api::V1::LocationsController < ApplicationController
     weather_object = {
       currently: weather_data["currently"],
       minutely: weather_data["minutely"],
-      city: lat_long_data["city"]
+      city: lat_long_data["city"].titleize
     }
+
+    save_a_location(lat_long_data["city"].titleize,lat_long_data["state"],lat_long_data["postal"].split('-')[0], lat_long_data["latt"], lat_long_data["longt"], 'currentSearch')
 
     render json: weather_object
   end
@@ -46,10 +52,26 @@ class Api::V1::LocationsController < ApplicationController
     weather_object = {
       currently: weather_data["currently"],
       minutely: weather_data["minutely"],
-      city: lat_long_data["standard"]["city"]
+      city: lat_long_data["standard"]["city"].titleize
     }
 
+    save_a_location(lat_long_data["standard"]["city"].titleize,lat_long_data["standard"]["countryname"].titleize,'', lat_long_data["latt"], lat_long_data["longt"], 'intlSearch')
+
     render json: weather_object
+  end
+
+  def save_a_location(city, state, zip, lat, long, search)
+    @user = User.find_by(username: params[:username])
+
+    @location = Location.find_or_create_by(city: city, state: state, zip: zip, lat: lat, long: long, search_type: search)
+
+    @user.locations << @location
+  end
+
+  def user_locations
+    @user = User.find_by(username: params[:username])
+
+    render json: @user.locations
   end
 
   private

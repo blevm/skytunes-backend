@@ -26,9 +26,10 @@ ActiveRecord::Schema.define(version: 2018_07_18_202046) do
   create_table "locations", force: :cascade do |t|
     t.string "city"
     t.string "state"
-    t.integer "zip"
-    t.decimal "lat"
-    t.decimal "long"
+    t.string "zip"
+    t.string "lat"
+    t.string "long"
+    t.string "search_type"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
