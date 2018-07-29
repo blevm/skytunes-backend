@@ -67,6 +67,20 @@ class Api::V1::UsersController < ApplicationController
     render json: rec_params
   end
 
+  def get_more_recommended_tracks
+    @user = User.find_by(username: params[:username])
+    @user.refresh_the_token
+
+    header = {Authorization: "Bearer #{@user["access_token"]}"}
+
+    additional_params = get_weather_attributes(params[:weather])
+
+    rec_response = RestClient.get("https://api.spotify.com/v1/recommendations/?type=tracks&seed_artists=#{@user.tracks.first(3).map{|artist|artist.spotify_id}.join(',')}&#{additional_params.to_query}", header)
+    rec_params = JSON.parse(rec_response.body)
+
+    render json: rec_params
+  end
+
   def get_seed_genres
     @user = User.find_by(username: params[:username])
     @user.refresh_the_token

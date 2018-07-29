@@ -10,6 +10,7 @@ Rails.application.routes.draw do
       get 'search-intl/:username/:search', to: 'locations#intl_search'
       get ':username/search-current', to: 'locations#current_search'
       get ':username/:weather/recommended-tracks', to: 'users#get_recommended_tracks'
+      get ':username/:weather/more-recommended-tracks', to: 'users#get_more_recommended_tracks'
       get ':username/seed-genres', to: 'users#get_seed_genres'
       post ':username/:title/new-playlist', to: 'users#new_playlist'
       get ':username/locations', to: 'locations#user_locations'
