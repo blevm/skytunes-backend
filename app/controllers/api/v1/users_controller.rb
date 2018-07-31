@@ -14,6 +14,16 @@ class Api::V1::UsersController < ApplicationController
     redirect_to "#{url}?#{params.to_query}"
   end
 
+  def checking
+    id = decoded_token[0]['id']
+    @user = User.find_by(id: id)
+
+    render json: {
+      username: @user.username,
+      image: @user.image_url
+    }
+  end
+
   def create
     if params[:error]
       puts 'ERROR', params
@@ -30,7 +40,9 @@ class Api::V1::UsersController < ApplicationController
                       spotify_url: user_params["external_urls"]["spotify"],
                       image_url: user_params["images"][0]["url"])
 
-      @user.update(access_token:auth_params["access_token"], refresh_token: auth_params["refresh_token"])
+      # @user.k = SecureRandom.urlsafe_base64(30)
+
+      @user.update(access_token:auth_params["access_token"], refresh_token: auth_params["refresh_token"], k: SecureRandom.urlsafe_base64(30))
 
       @user.artists.destroy_all
       @user.tracks.destroy_all
@@ -43,13 +55,9 @@ class Api::V1::UsersController < ApplicationController
         @user.tracks << Track.create(spotify_id: track["id"])
       end
 
-      url="http://localhost:3000/success/"
-      params={
-        username: @user.username,
-        image: @user.image_url
-      }
+      url="http://localhost:3000/success"
 
-      redirect_to "#{url}?#{params.to_query}"
+      redirect_to "#{url}/#{@user.k}"
     end
   end
 
@@ -123,11 +131,16 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def logout
-    @user = User.find_by(username: params[:username])
+    # byebug
+    id = decoded_token[0]['id']
+    @user = User.find_by(id: id)
 
-    @user.update(access_token:'', refresh_token: '')
+    @user.update(access_token:'', refresh_token: '', k: '')
 
-    redirect_to 'http://localhost:3000/'
+    # redirect_to 'http://localhost:3000/'
+    render json: {
+      message: 'Logged out'
+    }
   end
 
   private

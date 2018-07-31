@@ -69,7 +69,8 @@ class Api::V1::LocationsController < ApplicationController
   end
 
   def user_locations
-    @user = User.find_by(username: params[:username])
+    id = decoded_token[0]['id']
+    @user = User.find_by(id: id)
 
     render json: @user.locations
   end

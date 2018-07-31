@@ -1,12 +1,18 @@
-class SessionsController < ApplicationController
+class Api::V1::SessionsController < ApplicationController
 
   def create
-    @user = User.find_by(username: params["username"])
+    @user = User.find_by(k: params[:k])
+
+    # byebug
 
     if (@user)
+      # @user.update(k: '')
+
+      # byebug
+
       render json: {
         username: @user.username,
-        id: @user.id,
+        image: @user.image_url,
         token: get_token(payload(@user.username, @user.id))
       }
     else

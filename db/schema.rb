@@ -57,6 +57,7 @@ ActiveRecord::Schema.define(version: 2018_07_18_202046) do
     t.string "image_url"
     t.string "access_token"
     t.string "refresh_token"
+    t.string "k"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
