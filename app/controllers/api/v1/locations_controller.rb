@@ -40,7 +40,7 @@ class Api::V1::LocationsController < ApplicationController
       city: lat_long_data["city"].titleize
     }
 
-    save_a_location(lat_long_data["city"].titleize,lat_long_data["state"],lat_long_data["postal"].split('-')[0], lat_long_data["latt"], lat_long_data["longt"], 'currentSearch')
+    # save_a_location(lat_long_data["city"].titleize,lat_long_data["state"],lat_long_data["postal"].split('-')[0], lat_long_data["latt"], lat_long_data["longt"], 'currentSearch')
 
     render json: weather_object
   end
@@ -61,7 +61,8 @@ class Api::V1::LocationsController < ApplicationController
   end
 
   def save_a_location(city, state, zip, lat, long, search)
-    @user = User.find_by(username: params[:username])
+    id = decoded_token[0]['id']
+    @user = User.find_by(id: id)
 
     @location = Location.find_or_create_by(city: city, state: state, zip: zip, lat: lat, long: long, search_type: search)
 
@@ -73,6 +74,17 @@ class Api::V1::LocationsController < ApplicationController
     @user = User.find_by(id: id)
 
     render json: @user.locations
+  end
+
+  def delete_user_locations
+    user_id = decoded_token[0]['id']
+    @user = User.find_by(id: user_id)
+
+    @location = @user.saved_locations.find_by(location_id: params[:id])
+
+    deleted_location = @location.destroy
+
+    render json: deleted_location
   end
 
   private

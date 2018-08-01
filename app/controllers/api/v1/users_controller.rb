@@ -40,8 +40,6 @@ class Api::V1::UsersController < ApplicationController
                       spotify_url: user_params["external_urls"]["spotify"],
                       image_url: user_params["images"][0]["url"])
 
-      # @user.k = SecureRandom.urlsafe_base64(30)
-
       @user.update(access_token:auth_params["access_token"], refresh_token: auth_params["refresh_token"], k: SecureRandom.urlsafe_base64(30))
 
       @user.artists.destroy_all
@@ -62,7 +60,9 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def get_recommended_tracks
-    @user = User.find_by(username: params[:username])
+    id = decoded_token[0]['id']
+    @user = User.find_by(id: id)
+
     @user.refresh_the_token
 
     header = {Authorization: "Bearer #{@user["access_token"]}"}
@@ -76,7 +76,9 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def get_more_recommended_tracks
-    @user = User.find_by(username: params[:username])
+    id = decoded_token[0]['id']
+    @user = User.find_by(id: id)
+
     @user.refresh_the_token
 
     header = {Authorization: "Bearer #{@user["access_token"]}"}
@@ -89,8 +91,11 @@ class Api::V1::UsersController < ApplicationController
     render json: rec_params
   end
 
+  ########TO GET ALL THE AVAILABLE GENRES######
   def get_seed_genres
-    @user = User.find_by(username: params[:username])
+    id = decoded_token[0]['id']
+    @user = User.find_by(id: id)
+
     @user.refresh_the_token
 
     header = {Authorization: "Bearer #{@user["access_token"]}"}
@@ -102,7 +107,9 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def new_playlist
-    @user = User.find_by(username: params[:username])
+    id = decoded_token[0]['id']
+    @user = User.find_by(id: id)
+
     @user.refresh_the_token
 
     playlist_body = {
@@ -131,7 +138,6 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def logout
-    # byebug
     id = decoded_token[0]['id']
     @user = User.find_by(id: id)
 
