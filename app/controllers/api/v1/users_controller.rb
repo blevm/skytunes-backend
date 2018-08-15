@@ -14,6 +14,16 @@ class Api::V1::UsersController < ApplicationController
     redirect_to "#{url}?#{params.to_query}"
   end
 
+  def checking
+    id = decoded_token[0]['id']
+    @user = User.find_by(id: id)
+
+    render json: {
+      username: @user.username,
+      image: @user.image_url
+    }
+  end
+
   def create
     if params[:error]
       puts 'ERROR', params
@@ -30,7 +40,7 @@ class Api::V1::UsersController < ApplicationController
                       spotify_url: user_params["external_urls"]["spotify"],
                       image_url: user_params["images"][0]["url"])
 
-      @user.update(access_token:auth_params["access_token"], refresh_token: auth_params["refresh_token"])
+      @user.update(access_token:auth_params["access_token"], refresh_token: auth_params["refresh_token"], k: SecureRandom.urlsafe_base64(30))
 
       @user.artists.destroy_all
       @user.tracks.destroy_all
@@ -43,18 +53,16 @@ class Api::V1::UsersController < ApplicationController
         @user.tracks << Track.create(spotify_id: track["id"])
       end
 
-      url="http://localhost:3000/success/"
-      params={
-        username: @user.username,
-        image: @user.image_url
-      }
+      url="http://localhost:3000/success"
 
-      redirect_to "#{url}?#{params.to_query}"
+      redirect_to "#{url}/#{@user.k}"
     end
   end
 
   def get_recommended_tracks
-    @user = User.find_by(username: params[:username])
+    id = decoded_token[0]['id']
+    @user = User.find_by(id: id)
+
     @user.refresh_the_token
 
     header = {Authorization: "Bearer #{@user["access_token"]}"}
@@ -67,8 +75,27 @@ class Api::V1::UsersController < ApplicationController
     render json: rec_params
   end
 
+  def get_more_recommended_tracks
+    id = decoded_token[0]['id']
+    @user = User.find_by(id: id)
+
+    @user.refresh_the_token
+
+    header = {Authorization: "Bearer #{@user["access_token"]}"}
+
+    additional_params = get_weather_attributes(params[:weather])
+
+    rec_response = RestClient.get("https://api.spotify.com/v1/recommendations/?type=tracks&seed_artists=#{@user.tracks.first(3).map{|artist|artist.spotify_id}.join(',')}&#{additional_params.to_query}", header)
+    rec_params = JSON.parse(rec_response.body)
+
+    render json: rec_params
+  end
+
+  ########TO GET ALL THE AVAILABLE GENRES######
   def get_seed_genres
-    @user = User.find_by(username: params[:username])
+    id = decoded_token[0]['id']
+    @user = User.find_by(id: id)
+
     @user.refresh_the_token
 
     header = {Authorization: "Bearer #{@user["access_token"]}"}
@@ -80,7 +107,9 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def new_playlist
-    @user = User.find_by(username: params[:username])
+    id = decoded_token[0]['id']
+    @user = User.find_by(id: id)
+
     @user.refresh_the_token
 
     playlist_body = {
@@ -109,11 +138,15 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def logout
-    @user = User.find_by(username: params[:username])
+    id = decoded_token[0]['id']
+    @user = User.find_by(id: id)
 
-    @user.update(access_token:'', refresh_token: '')
+    @user.update(access_token:'', refresh_token: '', k: '')
 
-    redirect_to 'http://localhost:3000/'
+    # redirect_to 'http://localhost:3000/'
+    render json: {
+      message: 'Logged out'
+    }
   end
 
   private

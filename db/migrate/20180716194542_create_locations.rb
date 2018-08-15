@@ -3,9 +3,10 @@ class CreateLocations < ActiveRecord::Migration[5.2]
     create_table :locations do |t|
       t.string :city
       t.string :state
-      t.integer :zip
-      t.decimal :lat
-      t.decimal :long
+      t.string :zip
+      t.string :lat
+      t.string :long
+      t.string :search_type
 
       t.timestamps
     end

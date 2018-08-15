@@ -6,6 +6,7 @@ class CreateUsers < ActiveRecord::Migration[5.2]
       t.string :image_url
       t.string :access_token
       t.string :refresh_token
+      t.string :k
 
       t.timestamps
     end
